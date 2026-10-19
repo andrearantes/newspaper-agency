@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>
+      Topic List
+      <a href="{% url 'newspaper:topic-create' %}" class="btn btn-primary link-to-page">
+        Create
+      </a>
+    </h1>
+    <form method="get" action="">
+      {{ search_form|crispy }}
+      <input type="submit">
+    </form>
+    {% if topic_list %}
+    <ul>
+    {% for topic in topic_list %}
+        <li>
+            <a href="{{ topic.get_absolute_url }}">{{ topic.name }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+    {% else %}
+      <p>There are no topics.</p>
+    {% endif %}
+{% endblock %}

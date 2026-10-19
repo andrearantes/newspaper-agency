@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div style="background-color: #d0f0c0; min-height: 100vh; padding: 20px;">
+    <h1>
+      Redactor List
+      <a href="{% url 'newspaper:redactor-create' %}" class="btn btn-primary link-to-page">
+        Create
+      </a>
+    </h1>
+    <form method="get" action="" class="input-group">
+  <div class="input-group-prepend">
+    <span class="input-group-text">🔍</span>
+  </div>
+  {{ search_form|crispy }}
+    </form>
+      <input type="submit">
+    </form>
+    {% if redactor_list %}
+    <table class="table">
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Birth date</th>
+      </tr>
+    {% for redactor in redactor_list %}
+      <tr>
+        <td>{{ redactor.id }}</td>
+        <td><a href="{{ redactor.get_absolute_url }}">{{ redactor.username }} {% if user == redactor %} (Me){% endif %}</a></td>
+        <td>{{ redactor.first_name }}</td>
+        <td>{{ redactor.last_name }}</td>
+        <td>{{ redactor.birth_date|default:"/" }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+    {% else %}
+      <p>There are no redactors.</p>
+    {% endif %}
+{% endblock %}
