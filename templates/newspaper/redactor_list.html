@@ -8,13 +8,13 @@
         Create
       </a>
     </h1>
-    <form method="get" action="" class="input-group">
+    <form method="get" action="" class="input-group mb-3">
   <div class="input-group-prepend">
-    <span class="input-group-text">🔍</span>
   </div>
   {{ search_form|crispy }}
-    </form>
-      <input type="submit">
+  <div class="input-group-append">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
     </form>
     {% if redactor_list %}
     <table class="table">
@@ -24,14 +24,22 @@
         <th>First name</th>
         <th>Last name</th>
         <th>Birth date</th>
+        <th>Update</th>
+        <th>Delete</th>
       </tr>
     {% for redactor in redactor_list %}
       <tr>
         <td>{{ redactor.id }}</td>
-        <td><a href="{{ redactor.get_absolute_url }}">{{ redactor.username }} {% if user == redactor %} (Me){% endif %}</a></td>
+        <td><a href="{% url 'newspaper:redactor-detail' pk=redactor.id %}">{{ redactor.username }} {% if user == redactor %} (Me){% endif %}</a></td>
         <td>{{ redactor.first_name }}</td>
         <td>{{ redactor.last_name }}</td>
         <td>{{ redactor.birth_date|default:"/" }}</td>
+        <td>
+        <a href="{% url 'newspaper:redactor-update' pk=redactor.id %}" class="btn btn-sm btn-info">Update</a>
+        </td>
+        <td>
+        <a style="color: red" href="{% url 'newspaper:redactor-delete' pk=redactor.id %}">Delete</a>
+      </td>
       </tr>
     {% endfor %}
     </table>

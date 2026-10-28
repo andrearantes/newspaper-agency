@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.urls import reverse
 
 
 class Redactor(AbstractUser):
@@ -10,9 +11,19 @@ class Redactor(AbstractUser):
 class Topic(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+    redactors = models.ManyToManyField(Redactor, related_name="topics")
+    creator = models.ForeignKey(
+        Redactor,
+        on_delete=models.CASCADE,
+        related_name="created_topic",
+        null=True
+    )
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("newspaper:topic-detail", args=[self.pk])
 
 
 class Newspaper(models.Model):
@@ -21,9 +32,18 @@ class Newspaper(models.Model):
     published_date = models.DateField()
     redactors = models.ManyToManyField(Redactor, related_name="publications")
     topics = models.ManyToManyField(Topic, related_name="publications")
+    creator = models.ForeignKey(
+        Redactor,
+        on_delete=models.CASCADE,
+        related_name="created_newspapers",
+        null=True
+    )
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("newspaper:newspaper-detail", args=[self.pk])
 
 
 class Magazine(models.Model):
@@ -32,6 +52,15 @@ class Magazine(models.Model):
     published_date = models.DateField()
     redactors = models.ManyToManyField(Redactor, related_name="magazines")
     topics = models.ManyToManyField(Topic, related_name="magazines")
+    creator = models.ForeignKey(
+        Redactor,
+        on_delete=models.CASCADE,
+        related_name="created_magazines",
+        null=True
+    )
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("newspaper:magazine-detail", args=[self.pk])

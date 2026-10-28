@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ obj.title }}</h1>
+<h2>{{ redactor.first_name }} {{ redactor.last_name }}</h2>
+<p><strong>Primeiro nome:</strong> {{ redactor.first_name }}</p>
+<p><strong>Sobrenome:</strong> {{ redactor.last_name }}</p>
+<p><strong>Anos de experiência:</strong> {{ redactor.experience_years }}</p>
+<p><strong>Data de nascimento:</strong> {{ redactor.birth_date }}</p>
+{% endblock %}

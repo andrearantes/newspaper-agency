@@ -1,7 +1,9 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render
+from django.db.models import Q
 from django.views import generic
 from .models import (Redactor,
                      Topic,
@@ -49,7 +51,10 @@ class RedactorListView(LoginRequiredMixin, generic.ListView):
         redactor_id = self.request.GET.get("redactor")
 
         if name:
-            queryset = queryset.filter(name__icontains=name)
+            queryset = queryset.filter(Q(first_name__icontains=name)
+                                       | Q(last_name__icontains=name)
+                                       )
+
         if redactor_id:
             queryset = queryset.filter(id=redactor_id)
 
@@ -66,6 +71,59 @@ class RedactorCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = RedactorCreationForm
     template_name = "newspaper/redactor_form.html"
     success_url = reverse_lazy("newspaper:redactor-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Create Redactor"
+        return context
+
+
+class RedactorDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Redactor
+    template_name = "newspaper/redactor_confirm_delete.html"
+    success_url = reverse_lazy("newspaper:redactor-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user and not self.request.user.is_superuser:
+            raise PermissionDenied
+        return obj
+
+
+class RedactorUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Redactor
+    fields = ["username",
+              "email",
+              "first_name",
+              "last_name",
+              "experience_years",
+              "birth_date"
+              ]
+    template_name = "newspaper/redactor_form.html"
+    success_url = reverse_lazy("newspaper:redactor-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user and not self.request.user.is_superuser:
+            raise PermissionDenied
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Update Redactor"
+        return context
+
+
+class RedactorDetailView(generic.DetailView):
+    model = Redactor
+    template_name = "newspaper/redactor_detail.html"
+    success_url = reverse_lazy("newspaper:redactor-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user and not self.request.user.is_superuser:
+            raise PermissionDenied
+        return obj
 
 
 class TopicListView(LoginRequiredMixin, generic.ListView):
@@ -94,6 +152,51 @@ class TopicCreateView(LoginRequiredMixin, generic.CreateView):
     success_url = reverse_lazy("newspaper:topic-list")
 
 
+class TopicUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Topic
+    form_class = TopicForm
+    template_name = "newspaper/topic_form.html"
+    success_url = reverse_lazy("newspaper:topic-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class TopicDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Topic
+    template_name = "newspaper/topic_confirm_delete.html"
+    success_url = reverse_lazy("newspaper:topic-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class TopicDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Topic
+    template_name = "newspaper/topic_detail.html"
+    success_url = reverse_lazy("newspaper:topic-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["redactors"] = self.object.redactors.all()
+        return context
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
 class NewspaperListView(LoginRequiredMixin, generic.ListView):
     model = Newspaper
     context_object_name = "newspaper_list"
@@ -118,6 +221,46 @@ class NewspaperCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = NewspaperForm
     template_name = "newspaper/newspaper_form.html"
     success_url = reverse_lazy("newspaper:newspaper-list")
+
+
+class NewspaperUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Newspaper
+    form_class = NewspaperForm
+    template_name = "newspaper/newspaper_form.html"
+    success_url = reverse_lazy("newspaper:newspaper-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class NewspaperDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Newspaper
+    template_name = "newspaper/newspaper_confirm_delete.html"
+    success_url = reverse_lazy("newspaper:newspaper-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class NewspaperDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Newspaper
+    template_name = "newspaper/newspaper_detail.html"
+    success_url = reverse_lazy("newspaper:newspaper-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
 
 
 class MagazineListView(LoginRequiredMixin, generic.ListView):
@@ -145,3 +288,43 @@ class MagazineCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = MagazineCreationForm
     template_name = "newspaper/magazine_form.html"
     success_url = reverse_lazy("newspaper:magazine-list")
+
+
+class MagazineUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Magazine
+    form_class = MagazineCreationForm
+    template_name = "newspaper/magazine_form.html"
+    success_url = reverse_lazy("newspaper:magazine-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class MagazineDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Magazine
+    template_name = "newspaper/magazine_confirm_delete.html"
+    success_url = reverse_lazy("newspaper:magazine-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
+
+
+class MagazineDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Magazine
+    template_name = "newspaper/magazine_detail.html"
+    success_url = reverse_lazy("newspaper:magazine-list")
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if (obj.creator != self.request.user
+                and not self.request.user.is_superuser):
+            raise PermissionDenied
+        return obj
