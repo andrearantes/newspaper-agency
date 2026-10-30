@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div style="background-color: #d0f0c0; min-height: 100vh; padding: 20px;">
+    <h1>
+      Redactor List
+      <a href="{% url 'newspaper:redactor-create' %}" class="btn btn-primary link-to-page">
+        Create
+      </a>
+    </h1>
+    <form method="get" action="" class="input-group mb-3">
+  <div class="input-group-prepend">
+  </div>
+  {{ search_form|crispy }}
+  <div class="input-group-append">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+    </form>
+    {% if redactor_list %}
+    <table class="table">
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Birth date</th>
+        <th>Update</th>
+        <th>Delete</th>
+      </tr>
+    {% for redactor in redactor_list %}
+      <tr>
+        <td>{{ redactor.id }}</td>
+        <td><a href="{% url 'newspaper:redactor-detail' pk=redactor.id %}">{{ redactor.username }} {% if user == redactor %} (Me){% endif %}</a></td>
+        <td>{{ redactor.first_name }}</td>
+        <td>{{ redactor.last_name }}</td>
+        <td>{{ redactor.birth_date|default:"/" }}</td>
+        <td>
+        <a href="{% url 'newspaper:redactor-update' pk=redactor.id %}" class="btn btn-sm btn-info">Update</a>
+        </td>
+        <td>
+        <a style="color: red" href="{% url 'newspaper:redactor-delete' pk=redactor.id %}">Delete</a>
+      </td>
+      </tr>
+    {% endfor %}
+    </table>
+    {% else %}
+      <p>There are no redactors.</p>
+    {% endif %}
+{% endblock %}
