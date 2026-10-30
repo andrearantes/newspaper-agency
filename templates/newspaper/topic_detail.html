@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
- <h1>{{ object.name }}</h1>
-  <p>Redactor:
-  {% for redactor in redactors %}
-    {{ redactor.username }}{% if not forloop.last %}, {% endif %}
-  {% endfor %}
-</p>
-{% endblock %}
