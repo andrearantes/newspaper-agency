@@ -64,6 +64,16 @@ class MagazineCreationForm(forms.ModelForm):
     class Meta:
         model = Magazine
         fields = "__all__"
+        exclude = ["creator"]
+        widgets = {
+            "publish_date": forms.TextInput(
+                attrs={"placeholder": "dd/mm/yyyy"}
+            ),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["publish_date"].input_formats = ["%d/%m/%Y"]
 
 
 class TopicForm(forms.ModelForm):
@@ -72,6 +82,16 @@ class TopicForm(forms.ModelForm):
     class Meta:
         model = Topic
         fields = "__all__"
+        exclude = ["creator"]
+        widgets = {
+            "publish_date": forms.TextInput(
+                attrs={"placeholder": "dd/mm/yyyy"}
+            ),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["publish_date"].input_formats = ["%d/%m/%Y"]
 
 
 class NewspaperForm(forms.ModelForm):
@@ -80,3 +100,13 @@ class NewspaperForm(forms.ModelForm):
     class Meta:
         model = Newspaper
         fields = "__all__"
+        exclude = ["creator"]
+        widgets = {
+            "publish_date": forms.TextInput(
+                attrs={"placeholder": "dd/mm/yyyy"}
+            ),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["publish_date"].input_formats = ["%d/%m/%Y"]
