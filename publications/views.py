@@ -119,12 +119,6 @@ class RedactorDetailView(generic.DetailView):
     template_name = "newspaper/redactor_detail.html"
     success_url = reverse_lazy("newspaper:redactor-list")
 
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if obj != self.request.user and not self.request.user.is_superuser:
-            raise PermissionDenied
-        return obj
-
 
 class TopicListView(LoginRequiredMixin, generic.ListView):
     model = Topic
@@ -189,13 +183,6 @@ class TopicDetailView(LoginRequiredMixin, generic.DetailView):
         context["redactors"] = self.object.redactors.all()
         return context
 
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if (obj.creator != self.request.user
-                and not self.request.user.is_superuser):
-            raise PermissionDenied
-        return obj
-
 
 class NewspaperListView(LoginRequiredMixin, generic.ListView):
     model = Newspaper
@@ -254,13 +241,6 @@ class NewspaperDetailView(LoginRequiredMixin, generic.DetailView):
     model = Newspaper
     template_name = "newspaper/newspaper_detail.html"
     success_url = reverse_lazy("newspaper:newspaper-list")
-
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if (obj.creator != self.request.user
-                and not self.request.user.is_superuser):
-            raise PermissionDenied
-        return obj
 
 
 class MagazineListView(LoginRequiredMixin, generic.ListView):
@@ -321,10 +301,3 @@ class MagazineDetailView(LoginRequiredMixin, generic.DetailView):
     model = Magazine
     template_name = "newspaper/magazine_detail.html"
     success_url = reverse_lazy("newspaper:magazine-list")
-
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if (obj.creator != self.request.user
-                and not self.request.user.is_superuser):
-            raise PermissionDenied
-        return obj
