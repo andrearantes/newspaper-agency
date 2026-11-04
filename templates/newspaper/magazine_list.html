@@ -15,30 +15,43 @@
 
     {% if magazine_list %}
     <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Publication</th>
-          <th>Topics</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for magazine in magazine_list %}
-        <tr>
-          <td>
-            <a href="{{ magazine.get_absolute_url }}">{{ magazine.title }}</a>
-          </td>
-          <td>{{ magazine.published_date }}</td>
-          <td>
-            {% for topic in magazine.topics.all %}
-              {{ topic.title }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          </td>
-        </tr>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Publication Date</th>
+      <th>Topics</th>
+      <th>Redactor</th>
+      <th>Update</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for magazine in magazine_list %}
+    <tr>
+      <td>
+        <a href="{{ magazine.get_absolute_url }}">{{ magazine.title }}</a>
+      </td>
+      <td>{{ magazine.published_date }}</td>
+      <td>
+        {% for topic in magazine.topics.all %}
+          {{ topic.name }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
-      </tbody>
-    </table>
+      </td>
+      <td>
+      {% for redactor in magazine.redactors.all %}
+        {{ redactor.first_name }} {{ redactor.last_name }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+      </td>
+      <td>
+        <a href="{% url 'newspaper:magazine-update' pk=magazine.id %}">Update</a>
+      </td>
+      <td>
+        <a style="color: red" href="{% url 'newspaper:magazine-delete' pk=magazine.id %}">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
     {% else %}
       <p>There not avaliable magazine.</p>
     {% endif %}

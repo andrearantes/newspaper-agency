@@ -1,44 +1,58 @@
 {% extends "base.html" %}
 {% load crispy_forms_filters %}
 {% block content %}
-    <h1>
-      Newspaper List
-      <a href="{% url 'newspaper:newspaper-create' %}" class="btn btn-primary link-to-page">
-        Create
-      </a>
-    </h1>
-    <form action="" method="get" class="form-inline">
+  <h1>
+    Newspaper List
+    <a href="{% url 'newspaper:newspaper-create' %}" class="btn btn-primary link-to-page">
+      Create
+    </a>
+  </h1>
+  <form action="" method="get" class="form-inline">
     {{ search_form|crispy }}
     <input type="submit" value="Buscar" class="btn btn-secondary">
-    </form>
+  </form>
 
-    {% if newspaper_list %}
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Publication</th>
-          <th>Topics</th>
-        </tr>
-      </thead>
+  {% if newspaper_list %}
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Publication</th>
+      <th>Topics</th>
+      <th>Redactor</th>
+      <th>Update</th>
+      <th>Delete</th>
+    </tr>
+    </thead>
 
-      <tbody>
-        {% for newspaper in newspaper_list %}
-        <tr>
-          <td>
-            <a href="{{ newspaper.get_absolute_url }}">{{ newspaper.title }}</a>
-          </td>
-          <td>{{ newspaper.published_date }}</td>
-          <td>
-            {% for topic in newspaper.topics.all %}
-              {{ topic.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          </td>
-        </tr>
+    <tbody>
+    {% for newspaper in newspaper_list %}
+    <tr>
+      <td>
+        <a href="{{ newspaper.get_absolute_url }}">{{ newspaper.title }}</a>
+      </td>
+      <td>{{ newspaper.published_date }}</td>
+      <td>
+        {% for topic in newspaper.topics.all %}
+        {{ topic.name }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-      <p>There not avaliable newspaper.</p>
-    {% endif %}
+      </td>
+      <td>
+        {% for redactor in newspaper.redactors.all %}
+        {{ redactor.first_name }} {{ redactor.last_name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        <a href="{% url 'newspaper:newspaper-update' pk=newspaper.id %}">Update</a>
+      </td>
+      <td>
+        <a style="color: red" href="{% url 'newspaper:newspaper-delete' pk=newspaper.id %}">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>There not avaliable newspaper.</p>
+{% endif %}
 {% endblock %}
